@@ -1,0 +1,22 @@
+{
+  "incident_id": "F010-slowSQL.j8t8t2c40l62dc0eo9v5qujn11",
+  "workspace": "rca-benchmark",
+  "region_id": "cn-hongkong",
+  "time_range_start": "2026-04-15T13:16:23.169105+08:00",
+  "time_range_end": "2026-04-15T13:20:05+08:00",
+  "root_cause_entities": [
+    "inventory"
+  ],
+  "alert_event_id": "9911488e3808b31cba4d7740262e414b",
+  "alert_title": "frontend接口响应慢告警",
+  "alert_trigger_time": "2026-04-15T13:18:05+0800",
+  "prompt_text": "<code vibeops_object type=\"alert_event\">frontend接口响应慢告警<alert_event event_id=\"9911488e3808b31cba4d7740262e414b\" trans_id=\"j8t8t2c40l62dc0eo9v5qujn11\" rule_id=\"c82caa54-aae8-4445-ae64-76ec9b791479\" rule_name=\"frontend接口响应慢告警\" entity_id=\"d5479ffd165e089a67b3d4eeb8519fb7\" entity_name=\"frontend::POST /api/checkout\" entity_type=\"apm.operation\" entity_domain=\"apm\" alert_time=\"2026-04-15T13:18:05+0800\" /></code> 帮我分析下根因。",
+  "case_id": "F010-slowSQL.j8t8t2c40l62dc0eo9v5qujn11",
+  "raw_ground_truth": "{\"outcome\": {\"expected_fault_id\": \"F010-slowSQL\", \"target_entity_ids\": [\"ed13cb14265f98d9eb3b89b664760adb\"], \"target_entities\": [{\"entity_id\": \"ed13cb14265f98d9eb3b89b664760adb\", \"entity_name\": \"inventory\", \"entity_domain\": \"apm\", \"entity_type\": \"apm.service\"}], \"expected_conclusion\": \"inventory 的 slowSQL 在告警分钟触发 service latency/slow_count 上升，经 cart 传播后最终落到 frontend::POST /api/checkout 的慢响应告警。\"}, \"reasoning\": {\"steps\": [{\"step\": 1, \"title\": \"inventory 慢 SQL 直接抬升根因服务延迟\", \"step_type\": \"cause\", \"target\": \"inventory\", \"fault_id\": \"F010-slowSQL\", \"description\": \"inventory service 在告警分钟 avg_request_latency_seconds=0.096725s、slow_count=124 count/30s；同窗慢 trace 77355472103bfa420e19a0df315c447b 命中 SELECT inventory=10845.112ms 和 HikariDataSource.getConnection=2131.126ms。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.09672520661157025, \"unit\": \"s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"slow_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 124, \"unit\": \"count/30s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 2, \"title\": \"inventory 慢 SQL 先传播到 cart 服务\", \"step_type\": \"propagation\", \"target\": \"cart\", \"fault_id\": \"F010-slowSQL\", \"description\": \"topo 显示 frontend -> checkout -> cart -> inventory；其中 cart service 在告警分钟 avg_request_latency_seconds=0.025809s、slow_count=121 count/30s，说明 inventory 慢 SQL 已经传播到直接依赖的业务服务。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.025809340979892383, \"unit\": \"s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"slow_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 121, \"unit\": \"count/30s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 3, \"title\": \"frontend::POST /api/checkout 在告警分钟触发慢响应告警\", \"step_type\": \"impact\", \"target\": \"frontend::POST /api/checkout\", \"fault_id\": \"F010-slowSQL\", \"description\": \"alert entity frontend::POST /api/checkout 在告警分钟 avg_request_latency_seconds=0.358195s、request_count=3452 count/30s；该 operation 前 20 分钟均值被 13:15:35/13:16:05 两个尖峰污染，因此只保留告警分钟绝对值，不再编造 error_trace_count 一类伪 signal。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.35819503128617564, \"unit\": \"s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"request_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 3452, \"unit\": \"count/30s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}]}, \"metadata\": {}}",
+  "root_cause_types": [
+    "slowSQL"
+  ],
+  "alert_entity_id": "d5479ffd165e089a67b3d4eeb8519fb7",
+  "alert_entity_type": "apm.operation",
+  "alert_entity_domain": "apm"
+}

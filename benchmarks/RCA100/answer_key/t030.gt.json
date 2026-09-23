@@ -1,0 +1,22 @@
+{
+  "incident_id": "F010-slowSQL.am5h9bmp3t551539q5kpaptup5",
+  "workspace": "rca-benchmark",
+  "region_id": "cn-hongkong",
+  "time_range_start": "2026-03-16T06:31:27.317779+08:00",
+  "time_range_end": "2026-03-16T06:36:59+08:00",
+  "root_cause_entities": [
+    "inventory"
+  ],
+  "alert_event_id": "c496ca1b0374f53d04c23192d17dce23",
+  "alert_title": "inventory接口响应超时告警",
+  "alert_trigger_time": "2026-03-16T06:34:59+08:00",
+  "prompt_text": "<code vibeops_object type=\"alert_event\">inventory接口响应超时告警<alert_event event_id=\"c496ca1b0374f53d04c23192d17dce23\" trans_id=\"am5h9bmp3t551539q5kpaptup5\" rule_id=\"5fbe3e3d-7c22-428e-9436-75b68cf17afc\" rule_name=\"inventory接口响应超时告警\" /></code> 帮我分析下根因。",
+  "case_id": "F010-slowSQL.am5h9bmp3t551539q5kpaptup5",
+  "raw_ground_truth": "{\"outcome\": {\"expected_fault_id\": \"F010-slowSQL\", \"target_entity_ids\": [\"ed13cb14265f98d9eb3b89b664760adb\"], \"target_entities\": [{\"entity_id\": \"ed13cb14265f98d9eb3b89b664760adb\", \"entity_name\": \"inventory\", \"entity_domain\": \"apm\", \"entity_type\": \"apm.service\"}], \"expected_conclusion\": \"inventory 在告警分钟 2026-03-16T06:34:59+08:00 出现 slowSQL，service avg_request_latency_seconds=0.233142s、alert operation avg_request_latency_seconds=0.249741s，request trace 命中 2811.654ms SELECT inventory，触发 inventory接口响应超时告警。\"}, \"reasoning\": {\"steps\": [{\"step\": 1, \"title\": \"inventory 慢 SQL 生效\", \"step_type\": \"cause\", \"target\": \"inventory\", \"fault_id\": \"F010-slowSQL\", \"description\": \"告警分钟 2026-03-16T06:34:59+08:00，inventory service avg_request_latency_seconds=0.233142s，较告警前20分钟均值 0.032475s 上升 7.18x；slow_count=49 count/30s。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.233142, \"unit\": \"s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"slow_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 49, \"unit\": \"count/30s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 2, \"title\": \"inventory 异常传播\", \"step_type\": \"propagation\", \"target\": \"inventory\", \"fault_id\": \"\", \"description\": \"inventory 异常向下游 inventory::/api/v1/inventory/{productId} 传播\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.249741, \"unit\": \"s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 3, \"title\": \"告警接口在同一分钟进入高延迟\", \"step_type\": \"impact\", \"target\": \"inventory\", \"fault_id\": \"F010-slowSQL\", \"description\": \"同一告警分钟，alert operation avg_request_latency_seconds=0.249741s，较告警前20分钟均值 0.034290s 上升 7.28x；request_count=514 req/30s，slow_count=49 count/30s，request trace 命中 2811.654ms SELECT inventory。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.249741, \"unit\": \"s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"request_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 514, \"unit\": \"req/30s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"slow_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 49, \"unit\": \"count/30s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}]}, \"metadata\": {\"alert_entity_name\": \"inventory::/api/v1/inventory/{productId}\", \"alert_entity_type\": \"apm.operation\", \"alert_entity_domain\": \"apm\"}}",
+  "root_cause_types": [
+    "slowSQL"
+  ],
+  "alert_entity_id": "162799adab6799326676266a2c96cf3e",
+  "alert_entity_type": "apm.operation",
+  "alert_entity_domain": "apm"
+}

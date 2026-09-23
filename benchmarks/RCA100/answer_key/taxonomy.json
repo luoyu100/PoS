@@ -1,0 +1,790 @@
+{
+  "version": "1.0",
+  "source": "brise rca fault-type list + brise fault_type_hierarchy.yaml (2026-05-22)",
+  "scoring_rubric": {
+    "T3_exact_L3": 1.0,
+    "T2_same_L2": 0.5,
+    "T1_same_L1": 0.25,
+    "T0_different": 0.0
+  },
+  "hierarchy": {
+    "L1_categories": {
+      "1": "1 应用故障",
+      "2": "2 依赖服务",
+      "3": "3 基础设施",
+      "4": "4 外部与流量",
+      "5": "5 变更发布"
+    },
+    "L2_to_L1": {
+      "1.1 代码缺陷": "1",
+      "1.2 性能瓶颈": "1",
+      "2.1 依赖服务不可用": "2",
+      "2.2 依赖服务性能下降": "2",
+      "3.1 网络问题": "3",
+      "3.1 计算耗尽": "3",
+      "3.2 负载均衡故障": "3",
+      "3.3 物理/虚拟硬件故障": "3",
+      "4.1 流量激增": "4",
+      "4.3 热点问题": "4",
+      "5.1 变更发布": "5"
+    },
+    "L3_to_L2": {
+      "cachebreakdown": "1.2 性能瓶颈",
+      "codedefect": "1.1 代码缺陷",
+      "cpudeadloop": "1.1 代码缺陷",
+      "cpufullload": "1.2 性能瓶颈",
+      "dbnetworklatency": "3.1 网络问题",
+      "diskiohigh": "3.3 物理/虚拟硬件故障",
+      "dnsresolutionfailure": "3.1 网络问题",
+      "fullgc": "1.2 性能瓶颈",
+      "httperror5xx": "2.1 依赖服务不可用",
+      "loadbalancerfailure": "3.2 负载均衡故障",
+      "memorypressure": "1.2 性能瓶颈",
+      "messagequeuebacklog": "2.2 依赖服务性能下降",
+      "networkpolicyisolation": "3.1 网络问题",
+      "nodecpuhigh": "3.3 物理/虚拟硬件故障",
+      "nodedown": "3.3 物理/虚拟硬件故障",
+      "nodememoryoom": "3.1 计算耗尽",
+      "nullpointerexception": "1.1 代码缺陷",
+      "podcrashloop": "1.2 性能瓶颈",
+      "podpendingunschedulable": "3.2 负载均衡故障",
+      "podrestartflapping": "1.2 性能瓶颈",
+      "ratelimiting": "2.2 依赖服务性能下降",
+      "redisunavailable": "2.1 依赖服务不可用",
+      "replicascaledown": "5.1 变更发布",
+      "resourcelimitmisconfig": "5.1 变更发布",
+      "slowsql": "1.2 性能瓶颈",
+      "threadexhaustion": "1.1 代码缺陷",
+      "traffichotspot": "4.3 热点问题",
+      "trafficsurge": "4.1 流量激增",
+      "slowresource": "1.2 性能瓶颈"
+    }
+  },
+  "fault_definitions": {
+    "F001-nodeDown": {
+      "canonical": "nodedown",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.3 物理/虚拟硬件故障",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "node_down",
+        "节点宕机",
+        "物理机宕机",
+        "服务器宕机",
+        "nodenotready"
+      ],
+      "description": "物理机/虚拟机宕机或不可达，上面所有 Pod 一起挂掉",
+      "typical_evidence": "Node NotReady；ECS Stop 事件；节点 ping 不通；批量 Pod Evicted",
+      "causal_downstream": [
+        "podfail",
+        "httperror5xx"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Resilience",
+        "dim:secondary:Elasticity"
+      ]
+    },
+    "F002-threadExhaustion": {
+      "canonical": "threadexhaustion",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.1 代码缺陷",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "thread_exhaustion",
+        "线程打满",
+        "线程耗尽",
+        "java.threadpool",
+        "threadpool",
+        "threadfull",
+        "jvmthreadfull",
+        "线程过多"
+      ],
+      "description": "应用线程池中所有线程均被占用，新请求无法获取线程而排队/超时",
+      "typical_evidence": "线程池 active=max；大量线程 BLOCKED/WAITING；请求排队超时",
+      "causal_downstream": [
+        "httperror5xx",
+        "slowresource",
+        "podfail"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F004-trafficHotspot": {
+      "canonical": "traffichotspot",
+      "L1": "4",
+      "L1_name": "4 外部与流量",
+      "L2": "4.3 热点问题",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "traffic_hotspot",
+        "热点商品",
+        "流量热点",
+        "热点流量"
+      ],
+      "description": "大量请求集中在同一个 key/商品/接口，导致局部过载",
+      "typical_evidence": "某商品 ID 请求量远超其他；单分区/单 Pod 负载极高",
+      "causal_downstream": [
+        "cpuhigh"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:ServiceArchitecture"
+      ]
+    },
+    "F005-messageQueueBacklog": {
+      "canonical": "messagequeuebacklog",
+      "L1": "2",
+      "L1_name": "2 依赖服务",
+      "L2": "2.2 依赖服务性能下降",
+      "category_source": "brise_yaml",
+      "aliases": [],
+      "description": "消息队列消费速度跟不上生产速度，消息堆积延迟上升",
+      "typical_evidence": "Kafka/RocketMQ 消费延迟升高；堆积量持续增长",
+      "causal_downstream": [],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Serverless",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F006-trafficSurge": {
+      "canonical": "trafficsurge",
+      "L1": "4",
+      "L1_name": "4 外部与流量",
+      "L2": "4.1 流量激增",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "traffic_surge",
+        "流量激增",
+        "日志狂打",
+        "流量突增"
+      ],
+      "description": "外部流量短时间内大幅上涨，超出系统承载能力",
+      "typical_evidence": "QPS 短时翻倍以上；入口流量曲线出现尖峰",
+      "causal_downstream": [
+        "cpuhigh",
+        "threadexhaustion",
+        "httperror5xx",
+        "slowresource",
+        "ratelimiting",
+        "memorypressure"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F007-memoryPressure": {
+      "canonical": "memorypressure",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "memory_pressure",
+        "大对象创建",
+        "内存压力",
+        "频繁创建大对象"
+      ],
+      "description": "内存使用接近上限触发频繁 GC，应用响应变慢但尚未 OOM。特征是 GC 频率突发性尖峰（偶发性），区别于 F022 的持续高频 GC",
+      "typical_evidence": "GC 频率升高；GC pause 时间变长；响应 P99 上涨",
+      "causal_downstream": [
+        "fullgc",
+        "oomkill",
+        "slowresource"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F009-cacheBreakdown": {
+      "canonical": "cachebreakdown",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "cache_breakdown",
+        "缓存击穿",
+        "缓存穿透",
+        "redis打爆",
+        "cache miss"
+      ],
+      "description": "缓存失效/未命中导致大量请求穿透到后端数据库或下游服务",
+      "typical_evidence": "Redis miss 率升高；HGET 超时；后端 QPS 激增；error_rate 上升",
+      "causal_downstream": [
+        "slowsql",
+        "httperror5xx",
+        "threadexhaustion"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:ServiceArchitecture",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F010-slowSQL": {
+      "canonical": "slowsql",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "slow_sql",
+        "慢SQL",
+        "慢查询",
+        "数据库慢查询",
+        "slow query"
+      ],
+      "description": "数据库查询耗时过长（通常 >1s），导致上游请求堆积超时",
+      "typical_evidence": "慢查询日志；SQL 执行时间 >3s；RDS CPU/IO 升高；连接池打满",
+      "causal_downstream": [
+        "threadexhaustion"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:ServiceArchitecture",
+        "dim:secondary:Observability"
+      ]
+    },
+    "F011-codeDefect": {
+      "canonical": "codedefect",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.1 代码缺陷",
+      "category_source": "brise_yaml",
+      "aliases": [],
+      "description": "其他代码 bug：参数校验缺失、逻辑错误、配置错误等",
+      "typical_evidence": "特定接口错误率高；错误日志包含异常堆栈；非资源瓶颈类异常",
+      "causal_downstream": [],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": []
+    },
+    "F012-cpuDeadLoop": {
+      "canonical": "cpudeadloop",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.1 代码缺陷",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "cpu_dead_loop",
+        "死循环",
+        "CPU死循环",
+        "CPU 100%"
+      ],
+      "description": "代码逻辑陷入无限循环，导致单核 CPU 持续 100%（火焰图显示单一热点方法）。区别于 F034 的多核均匀高负载",
+      "typical_evidence": "CPU 使用率 100%；火焰图显示同一方法占比极高；profiling 热点集中",
+      "causal_downstream": [
+        "cpuhigh",
+        "threadexhaustion",
+        "httperror5xx",
+        "slowresource"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Resilience",
+        "dim:secondary:Elasticity"
+      ]
+    },
+    "F014-httpError5xx": {
+      "canonical": "httperror5xx",
+      "L1": "2",
+      "L1_name": "2 依赖服务",
+      "L2": "2.1 依赖服务不可用",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "http_error_5xx",
+        "HTTP 500",
+        "500错误",
+        "服务不可用",
+        "5xx"
+      ],
+      "description": "下游服务返回 HTTP 5xx，但当前证据还不足以进一步收敛到更具体根因时的兜底类型",
+      "typical_evidence": "调用成功率下降；5xx 计数激增；下游服务日志有异常",
+      "causal_downstream": [],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Observability",
+        "dim:secondary:ServiceArchitecture"
+      ]
+    },
+    "F016-rateLimiting": {
+      "canonical": "ratelimiting",
+      "L1": "2",
+      "L1_name": "2 依赖服务",
+      "L2": "2.2 依赖服务性能下降",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "rate_limiting",
+        "限流",
+        "HTTP 429",
+        "429",
+        "下游限流",
+        "throttle",
+        "too many requests",
+        "quota exceeded"
+      ],
+      "description": "下游服务触发限流、节流、配额保护或保护性拒绝，导致部分请求被主动拒绝；典型返回码为 429，也可能表现为带限流语义的 403",
+      "typical_evidence": "HTTP 429 Too Many Requests；限流日志；部分请求被拒",
+      "causal_downstream": [],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:ServiceArchitecture",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F018-dbNetworkLatency": {
+      "canonical": "dbnetworklatency",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.1 网络问题",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "db_network_latency",
+        "数据库网络延迟",
+        "network.delay",
+        "网络延迟",
+        "3306端口延迟",
+        "数据库连接超时"
+      ],
+      "description": "服务到关键依赖（包括数据库）的网络链路延迟、抖动或丢包，导致远端调用显著变慢",
+      "typical_evidence": "数据库连接 RT 升高；网络丢包率上升；TCP 重传增加",
+      "causal_downstream": [
+        "slowsql",
+        "threadexhaustion",
+        "httperror5xx"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:ServiceArchitecture",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F020-loadBalancerFailure": {
+      "canonical": "loadbalancerfailure",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.2 负载均衡故障",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "serviceselector",
+        "service_selector",
+        "Service Selector 错误",
+        "endpoints 为空",
+        "selector 不匹配",
+        "负载均衡故障"
+      ],
+      "description": "K8s Service Endpoints 异常或 LB 配置错误，流量无法正确转发",
+      "typical_evidence": "Endpoints 为空；Selector 不匹配；kube-proxy/iptables 异常；流量下跌",
+      "causal_downstream": [
+        "httperror5xx"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F022-fullGC": {
+      "canonical": "fullgc",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "full_gc",
+        "FullGC",
+        "频繁GC",
+        "GC停顿",
+        "java.gc.pause",
+        "gcpause",
+        "GC STW",
+        "gcStorm",
+        "gc_storm",
+        "GC风暴"
+      ],
+      "description": "JVM FullGC 持续高频触发（非偶发尖峰），STW 停顿导致应用长时间不可用。区别于 F007 的偶发性 GC 压力",
+      "typical_evidence": "FullGC 次数突增；STW 时间 >1s；堆内存老年代占满",
+      "causal_downstream": [
+        "slowsql",
+        "slowresource",
+        "httperror5xx",
+        "threadexhaustion"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Observability"
+      ]
+    },
+    "F023-nullPointerException": {
+      "canonical": "nullpointerexception",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.1 代码缺陷",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "null_pointer",
+        "NPE",
+        "空指针",
+        "NullPointerException",
+        "java.nullpointer",
+        "nullpointer"
+      ],
+      "description": "代码缺陷中的特定子类型：空引用被解引用（如 Java NPE），导致接口异常或 500",
+      "typical_evidence": "日志中出现 NullPointerException/NPE；错误率上升；特定接口 500",
+      "causal_downstream": [],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Automation",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F025-diskIOHigh": {
+      "canonical": "diskiohigh",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.3 物理/虚拟硬件故障",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "diskiohigh",
+        "disk_io_high",
+        "磁盘IO高",
+        "节点磁盘IO高负载"
+      ],
+      "description": "磁盘 IOPS 或延迟异常，导致读写操作变慢",
+      "typical_evidence": "IOPS 飙升；IO await >50ms；IO hang；应用响应变慢",
+      "causal_downstream": [
+        "slowsql",
+        "slowresource",
+        "httperror5xx"
+      ],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.node",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Observability"
+      ]
+    },
+    "F026-nodeCpuHigh": {
+      "canonical": "nodecpuhigh",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.3 物理/虚拟硬件故障",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "cpu.fullload",
+        "cpu full load",
+        "cpu load high",
+        "cpu满载",
+        "cpu高",
+        "节点CPU高",
+        "CPU使用率高",
+        "cpuload",
+        "fullload",
+        "nodecpuhigh"
+      ],
+      "description": "宿主机 CPU 使用率过高，导致上面运行的多个 Pod 同时被 throttle，是节点级故障而非单 Pod 问题",
+      "typical_evidence": "Node CPU >90%；容器 throttle 比例升高；cgroup CPU 限制触发",
+      "causal_downstream": [
+        "cpuhigh",
+        "threadexhaustion",
+        "slowresource",
+        "httperror5xx"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F029-redisUnavailable": {
+      "canonical": "redisunavailable",
+      "L1": "2",
+      "L1_name": "2 依赖服务",
+      "L2": "2.1 依赖服务不可用",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "redis_unavailable",
+        "Redis不可用",
+        "Redis连接超时",
+        "redis超时",
+        "redis连接失败",
+        "RedisTimeoutException",
+        "redisunavailable"
+      ],
+      "description": "Redis 或缓存实例不可用、不可达或持续拒绝连接，导致依赖方缓存调用整体失败",
+      "typical_evidence": "Redis connection refused；端口 6379 不可达；超时率 100%",
+      "causal_downstream": [
+        "cachebreakdown",
+        "threadexhaustion"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Resilience",
+        "dim:secondary:ServiceArchitecture"
+      ]
+    },
+    "F031-nodeMemoryOOM": {
+      "canonical": "nodememoryoom",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.1 计算耗尽",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "node_memory_oom",
+        "节点内存OOM",
+        "节点内存不足",
+        "物理机内存不足",
+        "Node内存高",
+        "memoryload",
+        "nodememoryoom",
+        "memory.oom"
+      ],
+      "description": "宿主机物理内存耗尽，触发 kernel OOM Killer 杀进程",
+      "typical_evidence": "Node 内存使用率 >95%；dmesg 中出现 oom-killer；多个 Pod 被杀",
+      "causal_downstream": [
+        "oomkill",
+        "podfail",
+        "memorypressure"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F034-cpuFullLoad": {
+      "canonical": "cpufullload",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "inferred (similar to brise.cpuhigh)",
+      "aliases": [
+        "CPU打满",
+        "cpuhigh",
+        "cpu_high"
+      ],
+      "description": "应用 CPU 多核均匀高负载（非单核死循环），可能由计算密集、外部压力或并发处理导致。区别于 F012 的单核死循环",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Elasticity"
+      ]
+    },
+    "F036-replicaScaleDown": {
+      "canonical": "replicascaledown",
+      "L1": "5",
+      "L1_name": "5 变更发布",
+      "L2": "5.1 变更发布",
+      "category_source": "inferred (deployment scale change)",
+      "aliases": [
+        "replicascaledown",
+        "replica_scale_down",
+        "副本缩零",
+        "scale-to-zero",
+        "副本数为0"
+      ],
+      "description": "Deployment replicas 被缩至 0，所有 Pod 被终止，Endpoints 变空，流量完全中断",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.deployment",
+      "tags": [
+        "dim:primary:Automation",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F039-resourceLimitMisconfig": {
+      "canonical": "resourcelimitmisconfig",
+      "L1": "5",
+      "L1_name": "5 变更发布",
+      "L2": "5.1 变更发布",
+      "category_source": "inferred (configuration error)",
+      "aliases": [
+        "resourcelimitmisconfig",
+        "resource_limit_misconfig",
+        "limit配置错误",
+        "limit过低",
+        "资源限额不足"
+      ],
+      "description": "容器 memory/CPU limit 配置过低，Pod 在正常负载下频繁触发 OOMKilled 或 CPU throttle。特征是重启后秒级再次异常 + limit 值明显偏低。区别于 F013(OOM) 的通用症状。",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.deployment",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Automation"
+      ]
+    },
+    "F050-podCrashLoop": {
+      "canonical": "podcrashloop",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "inferred (similar to brise.oomkill)",
+      "aliases": [
+        "podcrashloop",
+        "容器反复崩溃"
+      ],
+      "description": "容器启动后立即异常退出，Pod 持续进入 CrashLoopBackOff，restart_count 快速增长",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.pod",
+      "tags": [
+        "dim:primary:Automation",
+        "dim:secondary:Resilience"
+      ]
+    },
+    "F051-podPendingUnschedulable": {
+      "canonical": "podpendingunschedulable",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.2 负载均衡故障",
+      "category_source": "inferred (scheduling failure)",
+      "aliases": [
+        "podpendingunschedulable",
+        "pod_pending_long",
+        "pod 长时间 pending",
+        "unschedulable"
+      ],
+      "description": "Pod 因 nodeSelector、taint、资源或卷条件不满足而长期 Pending，无法进入 Running",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.pod",
+      "tags": [
+        "dim:primary:Elasticity",
+        "dim:secondary:Automation"
+      ]
+    },
+    "F052-podRestartFlapping": {
+      "canonical": "podrestartflapping",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "inferred (similar to podCrashLoop)",
+      "aliases": [
+        "podrestartflapping",
+        "pod_restart_frequent",
+        "pod 频繁重启",
+        "flapping restart"
+      ],
+      "description": "Pod 可短暂启动但周期性退出重启，表现为 restart_count 持续累加且服务间歇性可用",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.pod",
+      "tags": [
+        "dim:primary:Resilience",
+        "dim:secondary:Automation"
+      ]
+    },
+    "F056-networkPolicyIsolation": {
+      "canonical": "networkpolicyisolation",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.1 网络问题",
+      "category_source": "inferred (network policy blocking)",
+      "aliases": [
+        "network_policy_isolation",
+        "restrictive networkpolicy",
+        "networkPolicyDeny",
+        "egress deny",
+        "ingress deny",
+        "网络策略隔离"
+      ],
+      "description": "NetworkPolicy 或等效流量策略把特定服务间通信阻断，服务本身仍运行，但跨服务调用被拒绝或超时",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.networkpolicy",
+      "tags": [
+        "dim:primary:Resilience",
+        "dim:secondary:Automation"
+      ]
+    },
+    "F057-dnsResolutionFailure": {
+      "canonical": "dnsresolutionfailure",
+      "L1": "3",
+      "L1_name": "3 基础设施",
+      "L2": "3.1 网络问题",
+      "category_source": "inferred (DNS network failure)",
+      "aliases": [
+        "dns_resolution_failure",
+        "dnsFailure",
+        "name_resolution_error",
+        "DNS 解析失败",
+        "CoreDNS异常"
+      ],
+      "description": "Pod 内通过 Service 名称访问依赖时 DNS 解析失败或解析到错误地址，导致跨服务调用中断",
+      "typical_evidence": "",
+      "causal_downstream": [],
+      "injection_layer": "infrastructure",
+      "injection_entity_type": "k8s.pod",
+      "tags": [
+        "dim:primary:Resilience",
+        "dim:secondary:ServiceArchitecture"
+      ]
+    },
+    "F033-slowResource": {
+      "canonical": "slowresource",
+      "L1": "1",
+      "L1_name": "1 应用故障",
+      "L2": "1.2 性能瓶颈",
+      "category_source": "brise_yaml",
+      "aliases": [
+        "slow_resource",
+        "slowResource",
+        "响应变慢",
+        "静态资源加载慢",
+        "前端资源加载慢",
+        "首屏慢"
+      ],
+      "description": "前端静态资源加载变慢或服务响应耗时显著上升，影响首屏体验/接口延迟。常作为上游性能瓶颈（fullgc / cpuFullLoad / memoryPressure / dnsResolutionFailure 等）的传播/影响节点出现。",
+      "typical_evidence": "apm.service avg_request_latency_seconds 相较基线放大 >5x；request_count 显著下跌；slow_count 上升；P99 尾延迟拉长",
+      "causal_downstream": [
+        "httperror5xx"
+      ],
+      "injection_layer": "",
+      "injection_entity_type": "",
+      "tags": [
+        "dim:primary:Performance",
+        "dim:secondary:UserExperience"
+      ]
+    }
+  }
+}

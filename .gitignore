@@ -1,0 +1,41 @@
+# Credentials and machine-specific files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+._*
+*.orig
+*.rej
+*.bak
+
+# Generated experiments, workspaces, exports, and caches
+outputs/
+run_logs/
+**/.pos_workspaces/
+**/.pos_artifacts/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+data-gym-cache/
+.venv/
+.coverage
+htmlcov/
+*.egg-info/
+all_emails.json
+emails_export.json
+inbox_export.json
+
+# Runtime code is included; generated datasets and workspaces are not.
+benchmarks/ALFWorld/json_2.1.1/
+benchmarks/ALFWorld/logic/
+benchmarks/LOCA-Bench/workspaces/
+benchmarks/LOCA-Bench/outputs/
+benchmarks/RCA100/cases/
+benchmarks/ClinDiag/cases/
+benchmarks/ClinDiag/answer_key/
+benchmarks/**/DATASET_CARD.md
+*.zip
+*.tar.gz

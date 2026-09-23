@@ -1,0 +1,22 @@
+{
+  "incident_id": "F010-slowSQL.o8j8jhdndh6673usk0kooilsg3",
+  "workspace": "rca-benchmark",
+  "region_id": "cn-hongkong",
+  "time_range_start": "2026-03-17T02:40:37.193887+08:00",
+  "time_range_end": "2026-03-17T02:46:09+08:00",
+  "root_cause_entities": [
+    "inventory"
+  ],
+  "alert_event_id": "e604c93b4553352331b5bff3f7b11549",
+  "alert_title": "frontend响应时间突增告警",
+  "alert_trigger_time": "2026-03-17T02:44:09+08:00",
+  "prompt_text": "<code vibeops_object type=\"alert_event\">frontend响应时间突增告警<alert_event event_id=\"e604c93b4553352331b5bff3f7b11549\" trans_id=\"o8j8jhdndh6673usk0kooilsg3\" rule_id=\"bd9b5c12-f227-49d9-b3bd-9c6515ee906d\" rule_name=\"frontend响应时间突增告警\" /></code> 帮我分析下根因。",
+  "case_id": "F010-slowSQL.o8j8jhdndh6673usk0kooilsg3",
+  "raw_ground_truth": "{\"outcome\": {\"expected_fault_id\": \"F010-slowSQL\", \"target_entity_ids\": [\"ed13cb14265f98d9eb3b89b664760adb\"], \"target_entities\": [{\"entity_id\": \"ed13cb14265f98d9eb3b89b664760adb\", \"entity_name\": \"inventory\", \"entity_domain\": \"apm\", \"entity_type\": \"apm.service\"}], \"expected_conclusion\": \"inventory 在告警桶 02:44:09 的 avg_request_latency_seconds 从 0.021819s 抬升到 0.222094s，frontend::POST /api/cart 从 0.031097s 抬升到 0.247137s；o11y-lens trace 样本 db7b685c8ce086e45afd0699f5448a16 中 SELECT inventory 为 2843.554ms。\"}, \"reasoning\": {\"steps\": [{\"step\": 1, \"title\": \"inventory SQL 延迟抬升\", \"step_type\": \"cause\", \"target\": \"inventory\", \"fault_id\": \"F010-slowSQL\", \"description\": \"告警桶 02:44:09 inventory avg_request_latency_seconds=0.222094s，较 20 分钟基线 0.021819s 抬升 10.18x；同桶 slow_count=47 count/30s，窗口峰值 77 count/30s；trace db7b685c8ce086e45afd0699f5448a16 中 SELECT inventory=2843.554ms。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.222094, \"unit\": \"s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"slow_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 47, \"unit\": \"count/30s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 2, \"title\": \"inventory -> frontend::POST /api/cart propagation\", \"step_type\": \"propagation\", \"target\": \"inventory\", \"fault_id\": \"\", \"description\": \"inventory 异常向下游 frontend::POST /api/cart 传播\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.247137, \"unit\": \"s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 3, \"title\": \"frontend::POST /api/cart RT 上升并触发告警\", \"step_type\": \"impact\", \"target\": \"frontend::POST /api/cart\", \"fault_id\": \"F010-slowSQL\", \"description\": \"告警桶 02:44:09 frontend::POST /api/cart avg_request_latency_seconds=0.247137s，较 20 分钟基线 0.031097s 抬升 7.95x；窗口峰值 0.345695s。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.247137, \"unit\": \"s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}]}, \"metadata\": {\"alert_entity_name\": \"frontend::POST /api/cart\", \"alert_entity_type\": \"apm.operation\", \"alert_entity_domain\": \"apm\"}}",
+  "root_cause_types": [
+    "slowSQL"
+  ],
+  "alert_entity_id": "9e69280c47b4c2f35576402946e3b714",
+  "alert_entity_type": "apm.operation",
+  "alert_entity_domain": "apm"
+}

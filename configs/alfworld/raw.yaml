@@ -1,0 +1,28 @@
+benchmark: ALFWorld
+method: ReAct
+split: eval_out_of_distribution
+# Case indices use the half-open interval [start_case, end_case).
+start_case: 0
+end_case: 134
+max_steps: 50
+task_types:
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+include_actions: true
+model: qwen3.7-plus
+base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+api_key_env: DASHSCOPE_API_KEY
+temperature: 0
+max_tokens: 512
+max_json_retries: 2
+extra_body:
+  enable_thinking: false
+  response_format:
+    type: json_object
+output_run_name: qwen3.7-plus-raw
+context:
+  type: raw

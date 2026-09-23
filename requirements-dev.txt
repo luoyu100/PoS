@@ -1,0 +1,7 @@
+-r requirements.txt
+pytest==9.1.1
+ruff==0.16.7
+openpyxl==3.1.5
+numpy==2.0.2
+pandas==2.2.3
+pyarrow==19.0.1

@@ -1,0 +1,40 @@
+benchmark: LOCA-Bench
+method: ReAct
+harness: ReAct
+context:
+  type: raw
+output_run_name: qwen3.7-plus-raw
+loca_environment_length: 8k
+loca_task_names: all
+loca_seeds:
+- 42
+- 123
+- 456
+- 789
+- 2024
+# Case indices use the half-open interval [start_case, end_case).
+start_case: 0
+end_case: 75
+skip_existing: true
+# Worker crashes are retried; completed result files are not rerun.
+run_until_complete: true
+restart_delay_seconds: 10
+max_steps: 100
+loca_max_tool_uses: 100
+loca_tool_timeout_seconds: 120
+include_actions: true
+loca_observation_artifacts:
+  enabled: true
+  inline_max_chars: 8000
+  preview_items: 3
+  structured_only: true
+model: qwen3.7-plus
+base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+api_key_env: DASHSCOPE_API_KEY
+temperature: 0
+max_tokens: 4096
+max_json_retries: 2
+extra_body:
+  enable_thinking: false
+  response_format:
+    type: json_object

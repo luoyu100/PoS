@@ -1,0 +1,4 @@
+-r ../requirements.txt
+numpy==2.0.2
+alfworld==0.4.2
+textworld[pddl]==1.7.0

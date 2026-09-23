@@ -1,0 +1,4 @@
+# Core API-based runtime. Install benchmark extras separately.
+openai==2.46.0
+PyYAML==6.0.3
+tqdm==4.68.4

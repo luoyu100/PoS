@@ -1,0 +1,93 @@
+benchmark: ClinDiag
+method: ReAct-PoS
+harness: ReAct
+output_run_name: qwen3.7-plus-pos
+clindiag_subsets: all
+clindiag_case_ids: all
+# Case indices use the half-open interval [start_case, end_case).
+start_case: 0
+end_case: 604
+clindiag_observation_max_chars: 8000
+skip_existing: true
+# Worker crashes are retried; completed result files are not rerun.
+run_until_complete: true
+restart_delay_seconds: 10
+max_steps: 30
+include_actions: true
+model: qwen3.7-plus
+base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+api_key_env: DASHSCOPE_API_KEY
+temperature: 0
+max_tokens: 4096
+max_json_retries: 2
+extra_body:
+  enable_thinking: false
+  response_format:
+    type: json_object
+clindiag_provider_model:
+  model: qwen3.7-plus
+  base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  api_key_env: DASHSCOPE_API_KEY
+  temperature: 0
+  max_tokens: 1024
+  extra_body:
+    enable_thinking: false
+clindiag_judge_model:
+  model: qwen3.7-plus
+  base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  api_key_env: DASHSCOPE_API_KEY
+  temperature: 0
+  max_tokens: 512
+  max_json_retries: 2
+  extra_body:
+    enable_thinking: false
+    response_format:
+      type: json_object
+context:
+  type: belief
+  task_mode: diagnostic
+  update_every_steps: 1
+  agent_view: hybrid
+  # Progress is 1 only when the absolute inferred-confidence distance exceeds this threshold.
+  diagnostic_progress_threshold: 0.3
+  model:
+    model: qwen3.7-plus
+    base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    api_key_env: DASHSCOPE_API_KEY
+    temperature: 0
+    max_tokens: 4096
+    max_json_retries: 1
+    extra_body:
+      enable_thinking: false
+      response_format:
+        type: json_object
+  sentinel:
+    enabled: true
+    consistency_enabled: true
+    progress_enabled: true
+    local_audit_every_steps: 1
+    global_audit_every_steps: 8
+    recent_transition_count: 4
+    model:
+      model: qwen3.7-plus
+      base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api_key_env: DASHSCOPE_API_KEY
+      temperature: 0
+      max_tokens: 4096
+      max_json_retries: 1
+      extra_body:
+        enable_thinking: false
+        response_format:
+          type: json_object
+  # Use the latest K verified transitions, including frontier changes.
+  trapping:
+    enabled: true
+    window_size: 8
+    recurrence_epsilon: 0.15
+    max_cycle_length: 4
+    health_threshold: 0.25
+    cycle_threshold: 0.75
+  # Recovery constrains the policy; it does not directly execute actions.
+  recovery:
+    enabled: true
+    recent_low_progress_count: 4

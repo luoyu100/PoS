@@ -1,0 +1,22 @@
+{
+  "incident_id": "F026-nodeCpuHigh.8hfc7fqshh07hc3c02k5tuive4",
+  "workspace": "rca-benchmark",
+  "region_id": "cn-hongkong",
+  "time_range_start": "2026-04-10T18:45:31+08:00",
+  "time_range_end": "2026-04-10T18:56:10+08:00",
+  "root_cause_entities": [
+    "cn-hongkong.10.0.1.107"
+  ],
+  "alert_event_id": "bd80094ecae11779c256cf828c2b6d60",
+  "alert_title": "frontend响应时间突增告警",
+  "alert_trigger_time": "2026-04-10T18:54:10+08:00",
+  "prompt_text": "<code vibeops_object type=\"alert_event\">frontend响应时间突增告警<alert_event event_id=\"bd80094ecae11779c256cf828c2b6d60\" trans_id=\"8hfc7fqshh07hc3c02k5tuive4\" rule_id=\"bd9b5c12-f227-49d9-b3bd-9c6515ee906d\" rule_name=\"frontend响应时间突增告警\" /></code>\n\n帮我分析下根因。",
+  "case_id": "F026-nodeCpuHigh.8hfc7fqshh07hc3c02k5tuive4",
+  "raw_ground_truth": "{\"outcome\": {\"expected_fault_id\": \"F026-nodeCpuHigh\", \"target_entity_ids\": [\"e9ff88d0d4435e77b15e4cc955e04836\"], \"target_entities\": [{\"entity_id\": \"e9ff88d0d4435e77b15e4cc955e04836\", \"entity_name\": \"cn-hongkong.10.0.1.107\", \"entity_domain\": \"k8s\", \"entity_type\": \"k8s.node\"}], \"expected_conclusion\": \"Node cn-hongkong.10.0.1.107 的 CPU 在注入后升到 99.975925%，随后 node107 上的 frontend 本地副本处理 GET /cmd.php 时延迟升到 0.08534984s，触发 frontend 响应时间突增告警。\"}, \"reasoning\": {\"steps\": [{\"step\": 1, \"title\": \"节点 CPU 饱和\", \"step_type\": \"cause\", \"target\": \"cn-hongkong.10.0.1.107\", \"fault_id\": \"F026-nodeCpuHigh\", \"description\": \"node cn-hongkong.10.0.1.107 在注入窗口内 CPU 持续抬升，告警前最近 30s bucket 的 node_cpu_usage_rate=99.97592525717502%（pre-injection baseline 19.808703026277275%，5.05x）。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"k8s\", \"signal\": \"node_cpu_usage_rate\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 99.97592525717502, \"unit\": \"%\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 2, \"title\": \"cn-hongkong.10.0.1.107 -> frontend::GET /cmd.php propagation\", \"step_type\": \"propagation\", \"target\": \"cn-hongkong.10.0.1.107\", \"fault_id\": \"\", \"description\": \"cn-hongkong.10.0.1.107 异常向下游 frontend::GET /cmd.php 传播\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.08534984, \"unit\": \"s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 3, \"title\": \"frontend::GET /cmd.php 延迟突增\", \"step_type\": \"impact\", \"target\": \"frontend::GET /cmd.php\", \"fault_id\": \"F034-cpuFullLoad\", \"description\": \"o11y-lens trace 93ce6d4a42b27a87112a7f32916e926f 显示 GET /cmd.php 落在 frontend-6df7d557f5-sgfcb@cn-hongkong.10.0.1.107；该 operation 最近 pre-alert 非零 1m bucket（2026-04-10T18:52:01+08:00）avg_request_latency_seconds=0.08534984s，baseline 0.011425715s（7.47x）。当前 case 的 alert minute 没有新的非零 bucket，因此用最近可测 bucket 明确标注，不伪装成 18:54:10 exact 值。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"avg_request_latency_seconds\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.08534984, \"unit\": \"s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"request_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 1, \"unit\": \"count/min\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}]}, \"metadata\": {}}",
+  "root_cause_types": [
+    "nodeCpuHigh"
+  ],
+  "alert_entity_id": "30952d901ff8950f358ff5b153c995f4",
+  "alert_entity_type": "apm.operation",
+  "alert_entity_domain": "apm"
+}

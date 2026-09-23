@@ -1,0 +1,16 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra -p no:cacheprovider"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+extend-exclude = ["benchmarks/LOCA-Bench", "benchmarks/ALFWorld"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["E402"]
+"scripts/validate_rca100_gt.py" = ["E402"]

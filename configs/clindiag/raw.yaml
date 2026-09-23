@@ -1,0 +1,47 @@
+benchmark: ClinDiag
+method: ReAct
+harness: ReAct
+output_run_name: qwen3.7-plus-raw
+clindiag_subsets: all
+clindiag_case_ids: all
+# Case indices use the half-open interval [start_case, end_case).
+start_case: 0
+end_case: 604
+clindiag_observation_max_chars: 8000
+skip_existing: true
+# Worker crashes are retried; completed result files are not rerun.
+run_until_complete: true
+restart_delay_seconds: 10
+max_steps: 30
+include_actions: true
+model: qwen3.7-plus
+base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+api_key_env: DASHSCOPE_API_KEY
+temperature: 0
+max_tokens: 4096
+max_json_retries: 2
+extra_body:
+  enable_thinking: false
+  response_format:
+    type: json_object
+clindiag_provider_model:
+  model: qwen3.7-plus
+  base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  api_key_env: DASHSCOPE_API_KEY
+  temperature: 0
+  max_tokens: 1024
+  extra_body:
+    enable_thinking: false
+clindiag_judge_model:
+  model: qwen3.7-plus
+  base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  api_key_env: DASHSCOPE_API_KEY
+  temperature: 0
+  max_tokens: 512
+  max_json_retries: 2
+  extra_body:
+    enable_thinking: false
+    response_format:
+      type: json_object
+context:
+  type: raw

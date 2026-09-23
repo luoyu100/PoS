@@ -1,0 +1,22 @@
+{
+  "incident_id": "F016-rateLimiting.6a7ap7e9pd6of1p3aco5ldppj3",
+  "workspace": "rca-benchmark",
+  "region_id": "cn-hongkong",
+  "time_range_start": "2026-04-16T10:37:12.389867+08:00",
+  "time_range_end": "2026-04-16T10:42:05+08:00",
+  "root_cause_entities": [
+    "inventory"
+  ],
+  "alert_event_id": "d470bd1905bd069e214c83892092dc19",
+  "alert_title": "frontend异常告警",
+  "alert_trigger_time": "2026-04-16T10:40:05+0800",
+  "prompt_text": "<code vibeops_object type=\"alert_event\">frontend异常告警<alert_event event_id=\"d470bd1905bd069e214c83892092dc19\" trans_id=\"6a7ap7e9pd6of1p3aco5ldppj3\" rule_id=\"d4107ac6-2a37-4167-9059-16156c90f2bf\" rule_name=\"frontend异常告警\" entity_id=\"c6388887e91aa969bdf210fe96a48098\" entity_name=\"frontend::POST\" entity_type=\"apm.operation\" entity_domain=\"apm\" alert_time=\"2026-04-16T10:40:05+0800\" /></code> 帮我分析下根因。",
+  "case_id": "F016-rateLimiting.6a7ap7e9pd6of1p3aco5ldppj3",
+  "raw_ground_truth": "{\"outcome\": {\"expected_fault_id\": \"F016-rateLimiting\", \"target_entity_ids\": [\"ed13cb14265f98d9eb3b89b664760adb\"], \"target_entities\": [{\"entity_id\": \"ed13cb14265f98d9eb3b89b664760adb\", \"entity_name\": \"inventory\", \"entity_domain\": \"apm\", \"entity_type\": \"apm.service\"}], \"expected_conclusion\": \"inventory 在 2026-04-16T10:40:05+08:00 出现 error_count=5609/30s、error_rate=0.990115，错误传播到 frontend，使 frontend::POST error_rate=0.501551 并触发 frontend异常告警。\"}, \"reasoning\": {\"steps\": [{\"step\": 1, \"title\": \"inventory 限流生效\", \"step_type\": \"cause\", \"target\": \"inventory\", \"fault_id\": \"F016-rateLimiting\", \"description\": \"inventory 在告警分钟出现 error_count=5609/30s、error_rate=0.990115，同时 request_count=5665/30s（clean baseline 5304.89/30s），符合限流导致高比例拒绝的形态。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"error_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 5609.0, \"unit\": \"count/30s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"error_rate\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.990115, \"unit\": \"ratio\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"request_count\", \"required\": false, \"expected\": {\"comparator\": \">=\", \"value\": 5665.0, \"unit\": \"count/30s\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 2, \"title\": \"frontend 调 inventory 后错误回传\", \"step_type\": \"propagation\", \"target\": \"frontend\", \"fault_id\": \"F016-rateLimiting\", \"description\": \"frontend 对 inventory 存在 `inventory:9090` 依赖。告警分钟 frontend(service) error_count=10024/30s、error_rate=0.223755，说明上游 inventory 的限流错误已经回传到 frontend 服务层。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"error_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 10024.0, \"unit\": \"count/30s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"error_rate\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.223755, \"unit\": \"ratio\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}, {\"step\": 3, \"title\": \"frontend::POST 触发 frontend异常告警\", \"step_type\": \"impact\", \"target\": \"frontend::POST\", \"fault_id\": \"F016-rateLimiting\", \"description\": \"真实 alert_entity=frontend::POST。告警分钟该 operation error_count=5012/30s、error_rate=0.501551，与 frontend异常告警直接对齐。\", \"required\": true, \"queryable\": true, \"observability\": [{\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"error_count\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 5012.0, \"unit\": \"count/30s\", \"status\": \"\"}}, {\"source_type\": \"metric\", \"source\": \"apm\", \"signal\": \"error_rate\", \"required\": true, \"expected\": {\"comparator\": \">=\", \"value\": 0.501551, \"unit\": \"ratio\", \"status\": \"\"}}], \"conclusion_constraints\": null, \"time_range_hint\": \"\"}]}, \"metadata\": {}}",
+  "root_cause_types": [
+    "rateLimiting"
+  ],
+  "alert_entity_id": "c6388887e91aa969bdf210fe96a48098",
+  "alert_entity_type": "apm.operation",
+  "alert_entity_domain": "apm"
+}
