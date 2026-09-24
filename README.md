@@ -148,9 +148,3 @@ See [configuration](docs/configuration.md), [method implementation](docs/method.
 and [validation notes](docs/development.md). Offline checks are not a substitute
 for live provider and complete benchmark testing; the ClinDiag PoS template has
 not been tested in a real-model run.
-
-## License
-
-Original PoS code uses the [MIT License](LICENSE). Benchmark code and data retain
-their own [third-party terms](THIRD_PARTY_NOTICES.md). Run LOCA tools in an isolated
-environment without personal files or production credentials.
